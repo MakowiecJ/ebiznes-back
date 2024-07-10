@@ -43,5 +43,25 @@ jobs:
           imageToBuild: ebiznescont.azurecr.io/ebiznes-back:${{ github.sha }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
+      
+      - name: Send deployment email
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        run: |
+          curl --request POST \
+            --url https://api.sendgrid.com/v3/mail/send \
+            --header "Authorization: Bearer $SENDGRID_API_KEY" \
+            --header "Content-Type: application/json" \
+            --data '{
+              "personalizations": [{
+                "to": [{"email": "kubamakowiec@gmail.com"}]
+              }],
+              "from": {"email": "kubamakowiec@gmail.com"},
+              "subject": "Deployment Status",
+              "content": [{
+                "type": "text/plain",
+                "value": "The backend application has been successfully deployed to Azure Container Apps."
+              }]
+            }'
 
 
